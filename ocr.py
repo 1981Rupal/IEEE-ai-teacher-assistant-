@@ -1,148 +1,3 @@
-# import pytesseract
-# from PIL import Image
-# from pdf2image import convert_from_path
-# import cv2
-# import os
-# import tempfile
-# import tkinter as tk
-# from tkinter import filedialog
-
-# def pdf_to_text(pdf_path):
-#     """
-#     Extracts text from a PDF file, handling various scenarios and improving robustness.
-
-#     Args:
-#         pdf_path (str): The path to the PDF file.
-
-#     Returns:
-#         str: The extracted text, or None if an error occurs.
-#     """
-
-#     try:
-#         # 1. PDF Handling: Convert PDF to images
-#         with tempfile.TemporaryDirectory() as temp_dir:  # Create a temporary directory
-#             images = convert_from_path(pdf_path, output_folder=temp_dir)
-            
-#             full_text = ""
-
-#             for i, image in enumerate(images):
-#                 # Save each page as an image in the temporary directory
-#                 image_path = os.path.join(temp_dir, f"page_{i}.png")
-#                 image.save(image_path, "PNG")
-
-#                 # 2. Image Preprocessing (more robust)
-#                 img = cv2.imread(image_path)
-#                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#                 # Apply adaptive thresholding to handle varying lighting
-#                 thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-#                                             cv2.THRESH_BINARY_INV, 11, 2)
-
-#                 # 3, 4, 5. Text Localization, Character Segmentation, and Recognition
-#                 try:
-#                     text = pytesseract.image_to_string(thresh)
-#                     full_text += text + "\n"
-#                 except pytesseract.TesseractError as e:
-#                     print(f"Tesseract error on page {i + 1}: {e}")
-#                     full_text += f" [Error on page {i + 1}] \n"  # Indicate error in output
-            
-#             return full_text
-
-#     except Exception as e:
-#         print(f"An error occurred processing {pdf_path}: {e}")
-#         return None  # Return None to indicate failure
-
-# if __name__ == '__main__':
-#     root = tk.Tk()
-#     root.withdraw()  # Hide the main window
-
-#     pdf_file = filedialog.askopenfilename(title="Select a PDF file", 
-#                                             filetypes=[("PDF files", "*.pdf")])
-
-#     if pdf_file:
-#         extracted_text = pdf_to_text(pdf_file)
-#         if extracted_text:
-#             print("--- Extracted Text ---")
-#             print(extracted_text)
-#         else:
-#             print("Text extraction failed.")
-#     else:
-#         print("No file selected.")
-
-# import pytesseract
-# from PIL import Image
-# from pdf2image import convert_from_path
-# import cv2
-# import os
-# import tempfile
-# import tkinter as tk  # Keep the import, but use it conditionally
-# from tkinter import filedialog
-
-# def pdf_to_text(pdf_path):
-#     """
-#     Extracts text from a PDF file, handling various scenarios and improving robustness.
-
-#     Args:
-#         pdf_path (str): The path to the PDF file.
-
-#     Returns:
-#         str: The extracted text, or None if an error occurs.
-#     """
-
-#     try:
-#         # 1. PDF Handling: Convert PDF to images
-#         with tempfile.TemporaryDirectory() as temp_dir:  # Create a temporary directory
-#             images = convert_from_path(pdf_path, output_folder=temp_dir)
-            
-#             full_text = ""
-
-#             for i, image in enumerate(images):
-#                 # Save each page as an image in the temporary directory
-#                 image_path = os.path.join(temp_dir, f"page_{i}.png")
-#                 image.save(image_path, "PNG")
-
-#                 # 2. Image Preprocessing (more robust)
-#                 img = cv2.imread(image_path)
-#                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-#                 # Apply adaptive thresholding to handle varying lighting
-#                 thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-#                                             cv2.THRESH_BINARY_INV, 11, 2)
-
-#                 # 3, 4, 5. Text Localization, Character Segmentation, and Recognition
-#                 try:
-#                     text = pytesseract.image_to_string(thresh)
-#                     full_text += text + "\n"
-#                 except pytesseract.TesseractError as e:
-#                     print(f"Tesseract error on page {i + 1}: {e}")
-#                     full_text += f" [Error on page {i + 1}] \n"  # Indicate error in output
-                
-#             return full_text
-
-#     except Exception as e:
-#         print(f"An error occurred processing {pdf_path}: {e}")
-#         return None  # Return None to indicate failure
-
-# if __name__ == '__main__':
-#     try:
-#         root = tk.Tk()
-#         root.withdraw()  # Hide the main window
-
-#         pdf_file = filedialog.askopenfilename(title="Select a PDF file", 
-#                                             filetypes=[("PDF files", "*.pdf")])
-#     except tk.TclError:
-#         # Handle the case where tkinter fails (headless environment)
-#         print("Unable to open file dialog. Please enter the PDF file path manually.")
-#         pdf_file = input("Enter the path to your PDF file: ")
-
-#     if pdf_file:
-#         extracted_text = pdf_to_text(pdf_file)
-#         if extracted_text:
-#             print("--- Extracted Text ---")
-#             print(extracted_text)
-#         else:
-#             print("Text extraction failed.")
-#     else:
-#         print("No file selected.")
-
 import pytesseract
 from PIL import Image
 from pdf2image import convert_from_path
@@ -150,77 +5,87 @@ import cv2
 import os
 import tempfile
 
-def pdf_to_text(pdf_path):
-    """
-    Extracts text from a PDF file.
-
-    Args:
-        pdf_path (str): The path to the PDF file.
-
-    Returns:
-        str: The extracted text, or None if an error occurs.
-    """
+def process_image(image_path):
 
     try:
-        # 1. PDF Handling: Convert PDF to images
-        with tempfile.TemporaryDirectory() as temp_dir:  # Create a temporary directory
+        img = cv2.imread(image_path)
+        if img is None:
+            print(f"Failed to load image at path: {image_path}")
+            return None
+        cv2.imshow("Debug Image", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Check if the background is dark by sampling corner brightness
+        corners = [gray[0,0], gray[0,-1], gray[-1,0], gray[-1,-1]]
+        avg_corner = sum(corners) / 4
+
+        if avg_corner < 127:
+            gray = cv2.bitwise_not(gray)
+            _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        text = pytesseract.image_to_string(binary, lang='eng')
+        return text
+    except Exception as e:
+        print(f"Error processing image {image_path}: {e}")
+        return None
+
+def pdf_to_text(pdf_path):
+    """Extract text from a multi-page PDF using OCR on converted images."""
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
             images = convert_from_path(pdf_path, output_folder=temp_dir)
-            
             full_text = ""
 
             for i, image in enumerate(images):
-                # Save each page as an image in the temporary directory
                 image_path = os.path.join(temp_dir, f"page_{i}.png")
                 image.save(image_path, "PNG")
 
-                # 2. Image Preprocessing (more robust)
-                img = cv2.imread(image_path)
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                # Apply adaptive thresholding to handle varying lighting
-                thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                            cv2.THRESH_BINARY_INV, 11, 2)
-
-                # 3, 4, 5. Text Localization, Character Segmentation, and Recognition
-                try:
-                    text = pytesseract.image_to_string(thresh)
+                text = process_image(image_path)
+                if text:
                     full_text += text + "\n"
-                except pytesseract.TesseractError as e:
-                    print(f"Tesseract error on page {i + 1}: {e}")
-                    full_text += f" [Error on page {i + 1}] \n"  # Indicate error in output
-            
+                else:
+                    full_text += f"[Error on page {i + 1}]\n"
             return full_text
-
     except Exception as e:
-        print(f"An error occurred processing {pdf_path}: {e}")
-        return None  # Return None to indicate failure
+        print(f"An error occurred processing PDF: {e}")
+        return None
 
 if __name__ == '__main__':
-    pdf_file = ""  # Initialize pdf_file
+    file_path = ""  # Path selected by user
 
     try:
         import tkinter as tk
         from tkinter import filedialog
         root = tk.Tk()
-        root.withdraw()  # Hide the main window
+        root.withdraw()
 
-        pdf_file = filedialog.askopenfilename(title="Select a PDF file from your local system", 
-                                                filetypes=[("PDF files", "*.pdf")])
+        file_path = filedialog.askopenfilename(
+            title="Select a PDF or Image file",
+            filetypes=[("PDF files", "*.pdf"), ("Image files", "*.png;*.jpg;*.jpeg")]
+        )
     except ImportError:
-        print("tkinter is not available. Please provide the PDF file path manually.")
-        pdf_file = input("Enter the path to your PDF file: ")
+        print("tkinter not available. Please provide the file path manually.")
+        file_path = input("Enter the path to your PDF or image file: ")
     except tk.TclError:
-        print("Unable to open file dialog. Please provide the PDF file path manually.")
-        pdf_file = input("Enter the path to your PDF file: ")
+        print("Unable to open file dialog. Please provide the file path manually.")
+        file_path = input("Enter the path to your PDF or image file: ")
 
-    if pdf_file:
-        if os.path.exists(pdf_file):
-            extracted_text = pdf_to_text(pdf_file)
-            if extracted_text:
-                print("--- Extracted Text ---")
-                print(extracted_text)
-            else:
-                print("Text extraction failed.")
+    if file_path and os.path.exists(file_path):
+        ext = os.path.splitext(file_path)[1].lower()
+        if ext == ".pdf":
+            extracted_text = pdf_to_text(file_path)
+        elif ext in [".jpg", ".jpeg", ".png"]:
+            extracted_text = process_image(file_path)
         else:
-            print(f"Error: File not found at {pdf_file}")
+            print("Unsupported file type.")
+            extracted_text = None
+
+        if extracted_text:
+            print("\n--- Extracted Text ---\n")
+            print(extracted_text)
+        else:
+            print("Text extraction failed.")
     else:
-        print("No file selected.")
+        print("No valid file selected or file does not exist.")
